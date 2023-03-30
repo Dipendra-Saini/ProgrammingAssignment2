@@ -1,36 +1,43 @@
-## Put comments here that give an overall description of what your
-## functions do
-
-## Write a short comment describing this function
-
-makeCacheMatrix <- function(x = matrix()) {
-  # create a function to cache the inverse of x
-  cached_inv <- NULL
-  set <- function(y) {
-    x <<- y
-    cached_inv <<- NULL
+## Create a special "matrix" object that can cache its inverse
+## 'matrix' is a square invertible matrix
+make_cache_matrix <- function(matrix = matrix()) {
+  inv <- NULL
+  
+  set_matrix <- function(new_matrix) {
+    matrix <<- new_matrix
+    inv <<- NULL
   }
-  get <- function() x
-  setinv <- function(inverse) cached_inv <<- inverse
-  getinv <- function() cached_inv
-  list(set = set, get = get,
-       setinv = setinv,
-       getinv = getinv)
+  
+  get_matrix <- function() {
+    matrix
+  }
+  
+  set_inv <- function(new_inv) {
+    inv <<- new_inv
+  }
+  
+  get_inv <- function() {
+    inv
+  }
+  
+  list(set_matrix = set_matrix, 
+       get_matrix = get_matrix,
+       set_inv = set_inv,
+       get_inv = get_inv)
 }
 
-## This function caches the inverse of a matrix
-
-cacheSolve <- function(x, ...) {
-  # get the cached inverse if it exists
-  cached_inv <- x$getinv()
-  if (!is.null(cached_inv)) {
-    message("getting cached data")
-    return(cached_inv)
+## Compute the inverse of the special "matrix" returned by make_cache_matrix
+## If the inverse has already been calculated (and the matrix has not changed), then retrieve the inverse from the cache
+cache_solve <- function(cache_matrix, ...) {
+  inv <- cache_matrix$get_inv()
+  
+  if (!is.null(inv)) {
+    message("Retrieving cached data.")
+    return(inv)
   }
-  # if it doesn't exist, calculate the inverse and cache it
-  data <- x$get()
-  cached_inv <- solve(data, ...)
-  x$setinv(cached_inv)
-  cached_inv
+  
+  matrix <- cache_matrix$get_matrix()
+  inv <- solve(matrix, ...)
+  cache_matrix$set_inv(inv)
+  inv
 }
-
